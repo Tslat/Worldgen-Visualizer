@@ -1,0 +1,16 @@
+{
+  "required": true,
+  "package": "net.tslat.wgvisualizer.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "refmap": "wgvisualizer.refmap.json",
+  "mixins": [
+    "RegionFileCacheMixin",
+    "RegionFileMixin",
+    "ChunkLoaderMixin",
+    "ServerWorldMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "minVersion": "0.8"
+}
