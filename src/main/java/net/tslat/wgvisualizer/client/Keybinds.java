@@ -9,8 +9,6 @@ import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.tslat.wgvisualizer.WorldGenVisualizer;
 import net.tslat.wgvisualizer.client.screen.WorldgenSettingsScreen;
-import net.tslat.wgvisualizer.common.PacketHandling;
-import net.tslat.wgvisualizer.common.WorldgenSettingsPacket;
 import org.lwjgl.glfw.GLFW;
 
 @Mod.EventBusSubscriber(modid = WorldGenVisualizer.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
@@ -27,11 +25,10 @@ public class Keybinds {
 
 		if (WORLDGEN_SETTINGS_GUI.isPressed() && mc.player != null) {
 			if (mc.currentScreen == null) {
-				PacketHandling.INSTANCE.sendToServer(new WorldgenSettingsPacket());
-				//mc.displayGuiScreen(new WorldgenSettingsScreen());
+				mc.displayGuiScreen(new WorldgenSettingsScreen());
 			}
 			else if (mc.currentScreen instanceof WorldgenSettingsScreen) {
-				//mc.displayGuiScreen(null);
+				mc.displayGuiScreen(null);
 			}
 		}
 	}

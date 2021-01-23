@@ -1,5 +1,6 @@
 package net.tslat.wgvisualizer;
 
+import com.google.gson.JsonObject;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.network.IPacket;
 import net.minecraft.server.MinecraftServer;
@@ -8,6 +9,8 @@ import net.minecraft.util.math.SectionPos;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ChunkManager;
 import net.minecraft.world.server.ServerWorld;
+import net.minecraftforge.fml.LogicalSide;
+import net.minecraftforge.fml.LogicalSidedProvider;
 import net.tslat.wgvisualizer.worldgen.ServerChunkProviderHolder;
 
 import java.io.IOException;
@@ -54,5 +57,38 @@ public final class Operations {
 				}
 			}
 		}
+	}
+
+	public static boolean isClient() {
+		return LogicalSidedProvider.INSTANCE.get(LogicalSide.CLIENT);
+	}
+
+	public static void handleSettingsSync(JsonObject data) {
+
+	}
+
+	public static String toTitleCase(String str) {
+		str = str.toLowerCase();
+		int size = str.length();
+		StringBuilder buffer = new StringBuilder(size);
+		boolean space = true;
+
+		for (int i = 0; i < size; i++) {
+			char ch = str.charAt(i);
+
+			if (Character.isWhitespace(ch) || ch == '_') {
+				buffer.append(' ');
+				space = true;
+			}
+			else if (space) {
+				buffer.append(Character.toTitleCase(ch));
+				space = false;
+			}
+			else {
+				buffer.append(ch);
+			}
+		}
+
+		return buffer.toString();
 	}
 }

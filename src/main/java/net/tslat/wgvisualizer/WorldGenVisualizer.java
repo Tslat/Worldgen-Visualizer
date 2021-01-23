@@ -12,7 +12,9 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.tslat.wgvisualizer.client.Keybinds;
-import net.tslat.wgvisualizer.common.PacketHandling;
+import net.tslat.wgvisualizer.common.network.PacketHandling;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import static net.tslat.wgvisualizer.WorldGenVisualizer.MOD_ID;
 
@@ -20,6 +22,7 @@ import static net.tslat.wgvisualizer.WorldGenVisualizer.MOD_ID;
 public class WorldGenVisualizer {
 	public static final String VERSION = "1.0";
 	public static final String MOD_ID = "wgvisualizer";
+	public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
 
 	public WorldGenVisualizer() {
 		initRegistries();

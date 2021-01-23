@@ -1,8 +1,0 @@
-{
-  "generator.wgvisualizer.world_gen_tweaking": "Worldgen Visualizer",
-  "key.wgvisualizer.openGui": "Open Worldgen Visualizer GUI",
-  "key.categories.wgvisualizer": "Worldgen Visualizer",
-  "screen.wgvisualizer.settings": "Worldgen Visualizer Settings",
-  "message.wgvisualizer.feedback.loginWarning": "WARNING! Worldgen Visualizer is installed. This world will NOT save. Remove Worldgen Visualizer if you are not testing worldgen settings!",
-  "screen.wgvisualizer.settings.title": "Worldgen Settings"
-}

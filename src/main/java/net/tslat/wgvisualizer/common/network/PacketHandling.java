@@ -1,4 +1,4 @@
-package net.tslat.wgvisualizer.common;
+package net.tslat.wgvisualizer.common.network;
 
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.network.NetworkRegistry;
@@ -11,5 +11,6 @@ public class PacketHandling {
 
 	public static void init() {
 		INSTANCE.registerMessage(0, WorldgenSettingsPacket.class, WorldgenSettingsPacket::encode, WorldgenSettingsPacket::decode, WorldgenSettingsPacket::receiveMessage);
+		INSTANCE.registerMessage(1, WorldgenHandshakePacket.class, WorldgenHandshakePacket::encode, WorldgenHandshakePacket::decode, WorldgenHandshakePacket::receiveMessage);
 	}
 }
