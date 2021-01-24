@@ -7,10 +7,12 @@ import com.google.gson.JsonPrimitive;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
+import net.tslat.wgvisualizer.Operations;
 import net.tslat.wgvisualizer.WorldGenVisualizer;
 import net.tslat.wgvisualizer.client.screen.widget.JsonValueWidget;
 import org.apache.logging.log4j.Level;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -131,31 +133,37 @@ public final class JsonFieldOperations {
 		return new ArrayList<>();
 	}
 
-	public static JsonValueWidget<?> jsonToWidget(int x, int y, String fieldId, JsonElement jsonElement, JsonElement titleObject) {
-		if (jsonElement.isJsonPrimitive()) {
-			JsonPrimitive primitiveElement = jsonElement.getAsJsonPrimitive();
+	public static JsonValueWidget<?> jsonToWidget(int x, int y, String fieldId, @Nullable JsonElement defaultElement, JsonElement currentElement, JsonFieldsHolder<?> parent) {
+		if (currentElement.isJsonPrimitive()) {
+			JsonPrimitive primitiveElement = currentElement.getAsJsonPrimitive();
 
 			if (primitiveElement.isString()) {
-				return new JsonTextField(Minecraft.getInstance().fontRenderer, x, y, fieldId, primitiveElement.getAsString(), primitiveElement.getAsString(), new StringTextComponent(primitiveElement.getAsString()));
+				return new JsonTextField(Minecraft.getInstance().fontRenderer, x, y, fieldId, parent, defaultElement != null ? defaultElement.getAsString() : "NULL", currentElement.getAsString(), new StringTextComponent(Operations.toTitleCase(primitiveElement.getAsString())));
 			}
 			else if (primitiveElement.isBoolean()) {
-				return new JsonBooleanButton(x, y, fieldId, primitiveElement.getAsBoolean(), primitiveElement.getAsBoolean(), new TranslationTextComponent("button." + WorldGenVisualizer.MOD_ID + ".boolean." + primitiveElement.getAsBoolean()));
+				return new JsonBooleanButton(x, y, fieldId, parent, defaultElement != null ? defaultElement.getAsBoolean() : !currentElement.getAsBoolean(), currentElement.getAsBoolean(), new TranslationTextComponent("button." + WorldGenVisualizer.MOD_ID + ".boolean." + primitiveElement.getAsBoolean()));
 			}
 			else if (primitiveElement.isNumber()) {
-
+				return new JsonNumberField(Minecraft.getInstance().fontRenderer, x, y, fieldId, parent, defaultElement != null ? defaultElement.getAsNumber() : currentElement.getAsNumber(), currentElement.getAsNumber(), new TranslationTextComponent(primitiveElement.getAsNumber().toString()));
 			}
 		}
-		else if (jsonElement.isJsonObject()) {
-			JsonObjectsField data = new JsonObjectsField(fieldId, null, jsonElement.getAsJsonObject(), jsonElement.getAsJsonObject(), new StringTextComponent(""));
+		else if (currentElement.isJsonObject()) {
+			JsonObjectsField data = new JsonObjectsField(parent.x, parent.y, fieldId, parent, defaultElement != null ? defaultElement.getAsJsonObject() : new JsonObject(), currentElement.getAsJsonObject(), new StringTextComponent(""), parent.buttonAddFunction);
+			data.visible = false;
 
-			return new JsonFieldsHolderButton<JsonObject>(x, y, fieldId, data, new StringTextComponent(fieldId), button -> {});
+			parent.buttonAddFunction.accept(data);
+
+			return new JsonFieldsHolderButton<JsonObject>(x, y, fieldId, data, new StringTextComponent(Operations.toTitleCase(fieldId)));
 		}
-		else if (jsonElement.isJsonArray()) {
-			JsonListField data = new JsonListField(fieldId, null, jsonElement.getAsJsonArray(), jsonElement.getAsJsonArray(), new StringTextComponent(""));
+		else if (currentElement.isJsonArray()) {
+			JsonListField data = new JsonListField(parent.x, parent.y, fieldId, parent, defaultElement != null ? defaultElement.getAsJsonArray() : new JsonArray(), currentElement.getAsJsonArray(), new StringTextComponent(""), parent.buttonAddFunction);
+			data.visible = false;
 
-			return new JsonFieldsHolderButton<JsonArray>(x, y, fieldId, data, new StringTextComponent(fieldId), button -> {});
+			parent.buttonAddFunction.accept(data);
+
+			return new JsonFieldsHolderButton<JsonArray>(x, y, fieldId, data, new StringTextComponent(Operations.toTitleCase(fieldId)));
 		}
 
-		return new JsonBooleanButton(x, y, fieldId, false, false, new TranslationTextComponent("button." + WorldGenVisualizer.MOD_ID + ".boolean." + false));
+		return new JsonBooleanButton(x, y, fieldId, parent, false, false, new TranslationTextComponent("button." + WorldGenVisualizer.MOD_ID + ".boolean." + false));
 	}
 }

@@ -12,13 +12,15 @@ public class JsonBooleanButton extends ExtendedButton implements JsonValueWidget
 	private boolean state;
 
 	private final String fieldId;
+	private final JsonFieldsHolder<?> parent;
 
-	public JsonBooleanButton(int x, int y, String fieldId, boolean currentState, boolean defaultState, ITextComponent title) {
+	public JsonBooleanButton(int x, int y, String fieldId, JsonFieldsHolder<?> parent, boolean defaultState, boolean currentState, ITextComponent title) {
 		super(x, y, JSON_WIDGET_WIDTH, JSON_WIDGET_HEIGHT, title, button -> ((JsonBooleanButton)button).toggle());
 
 		this.defaultState = defaultState;
 		this.state = currentState;
 		this.fieldId = fieldId;
+		this.parent = parent;
 	}
 
 	@Override
@@ -51,5 +53,6 @@ public class JsonBooleanButton extends ExtendedButton implements JsonValueWidget
 		this.state = !state;
 
 		this.setMessage(new TranslationTextComponent("button." + WorldGenVisualizer.MOD_ID + ".boolean." + state));
+		parent.updateChanges();
 	}
 }

@@ -23,6 +23,7 @@
   "button.wgvisualizer.features": "Features",
   "button.wgvisualizer.structures": "Structures",
   "button.wgvisualizer.back": "Back",
+  "button.wgvisualizer.list.open": "Open",
   "field.wgvisualizer.presetId": "Configuration ID:",
   "dialogue.wgvisualizer.feedback.updateInProgress": "Failed to apply worldgen settings, %1$s is already updating the configuration!"
 }

@@ -2,37 +2,45 @@ package net.tslat.wgvisualizer.client.screen.widget.json;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.widget.Widget;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
+import net.tslat.wgvisualizer.Operations;
+import net.tslat.wgvisualizer.client.RenderUtils;
 import net.tslat.wgvisualizer.client.screen.widget.JsonValueWidget;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class JsonObjectsField extends JsonFieldsHolder<JsonObject> {
-	private ArrayList<JsonValueWidget<?>> subWidgets = new ArrayList<JsonValueWidget<?>>();
+	private static final ResourceLocation ARROWS_TEXTURE = new ResourceLocation("textures/gui/server_selection.png");
+	protected Supplier<JsonObject> rootSaveFunction;
 
-	private int scrollAmount = 0;
+	public JsonObjectsField(int x, int y, String fieldId, JsonFieldsHolder<?> parent, JsonObject defaultValues, JsonObject currentValues, ITextComponent title, Consumer<JsonFieldsHolder<?>> swapConsumer) {
+		super(x, y, parent, fieldId, title, swapConsumer);
 
-	public JsonObjectsField(String fieldId, JsonFieldsHolder<?> parent, JsonObject currentValues, JsonObject defaultValues, ITextComponent title) {
-		super(0, 26, parent, fieldId, title);
-
-		int yOffset = 5;
+		int yOffset = y + 5;
 
 		for (Map.Entry<String, JsonElement> value : currentValues.entrySet()) {
-			JsonElement element = defaultValues.get(value.getKey());
+			JsonElement currentElement = value.getValue();
+			JsonElement defaultElement = defaultValues.get(value.getKey());
 
-			if (element == null)
-				element = value.getValue();
-
-			subWidgets.add(JsonFieldOperations.jsonToWidget(128, yOffset, value.getKey(), element, element));
+			subWidgets.add(JsonFieldOperations.jsonToWidget(x + width - 105, yOffset, value.getKey(), defaultElement, currentElement, this));
 
 			yOffset += 20;
 		}
 	}
 
-	@Override
-	public int getFGColor() {
-		return isEdited() ? 0xFF6060 : super.getFGColor();
+	public JsonObjectsField setSaveFunction(Supplier<JsonObject> rootSaveFunction) {
+		this.rootSaveFunction = rootSaveFunction;
+
+		return this;
 	}
 
 	@Override
@@ -41,20 +49,10 @@ public class JsonObjectsField extends JsonFieldsHolder<JsonObject> {
 		int yOffset = 5;
 
 		for (Map.Entry<String, JsonElement> value : values.entrySet()) {
-			subWidgets.add(JsonFieldOperations.jsonToWidget(128, yOffset, value.getKey(), value.getValue(), value.getValue()));
+			subWidgets.add(JsonFieldOperations.jsonToWidget(x + width - 105, yOffset, value.getKey(), value.getValue(), value.getValue(), this));
 
 			yOffset += 20;
 		}
-	}
-
-	@Override
-	public void onClick(double mouseX, double mouseY) {
-		super.onClick(mouseX, mouseY);
-	}
-
-	@Override
-	public boolean mouseScrolled(double mouseX, double mouseY, double delta) {
-		return false;
 	}
 
 	@Override
@@ -69,12 +67,55 @@ public class JsonObjectsField extends JsonFieldsHolder<JsonObject> {
 	}
 
 	@Override
-	public boolean isEdited() {
-		for (JsonValueWidget<?> widget : subWidgets) {
-			if (widget.isEdited())
-				return true;
-		}
+	public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+		if (visible) {
+			FontRenderer fontRenderer = Minecraft.getInstance().fontRenderer;
+			String truncatedBreadcrum = Operations.toTitleCase(breadcrumb);
+			int breadcrumbWidth = fontRenderer.getStringWidth(truncatedBreadcrum);
 
-		return false;
+			while (breadcrumbWidth > 240) {
+				truncatedBreadcrum = truncatedBreadcrum.replaceFirst(">", "");
+				truncatedBreadcrum = "... > " + truncatedBreadcrum.substring(truncatedBreadcrum.indexOf(">") + 2);
+				breadcrumbWidth = fontRenderer.getStringWidth("... > " + truncatedBreadcrum);
+			}
+
+			fontRenderer.drawStringWithShadow(matrixStack, truncatedBreadcrum, x + 5, y - 30, 0xDDDDDD);
+			fillGradient(matrixStack, x, y, x + width, y + height, -1072689136, -804253680);
+
+			for (int i = 0; i < subWidgets.size(); i++) {
+				JsonValueWidget<?> jsonWidget = subWidgets.get(i);
+				Widget widget = (Widget)jsonWidget;
+				String id = jsonWidget.getFieldId();
+				int yPos = y + 5 + i * 20 - (int)scrollAmount * 20;
+				widget.y = yPos;
+
+				if (widget.y + 5 < y + height && widget.y > y) {
+					widget.visible = true;
+
+					widget.render(matrixStack, mouseX, mouseY, partialTicks);
+					fontRenderer.drawStringWithShadow(matrixStack, Operations.toTitleCase(id), x + 5, yPos, 0xDDDDDD);
+				}
+				else {
+					widget.visible = false;
+				}
+			}
+
+			boolean bound = false;
+			RenderSystem.enableAlphaTest();
+
+			if ((int)scrollAmount > 0) {
+				bound = true;
+
+				Minecraft.getInstance().textureManager.bindTexture(ARROWS_TEXTURE);
+				RenderUtils.renderCustomSizedTexture(matrixStack, x + width / 2 - 3, y - 3, 99, 5, 11, 7, 256, 256);
+			}
+
+			if ((int)scrollAmount < subWidgets.size() - 7) {
+				if (!bound)
+					Minecraft.getInstance().textureManager.bindTexture(ARROWS_TEXTURE);
+
+				RenderUtils.renderCustomSizedTexture(matrixStack, x + width / 2 - 3, y + height - 4, 67, 20, 11, 7, 256, 256);
+			}
+		}
 	}
 }

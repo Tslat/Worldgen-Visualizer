@@ -80,6 +80,10 @@ public final class Operations {
 				buffer.append(' ');
 				space = true;
 			}
+			else if (ch == ':') {
+				buffer.append(':');
+				space = true;
+			}
 			else if (space) {
 				buffer.append(Character.toTitleCase(ch));
 				space = false;

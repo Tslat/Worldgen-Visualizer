@@ -2,15 +2,17 @@ package net.tslat.wgvisualizer.client.screen;
 
 import com.google.gson.JsonObject;
 import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.serialization.JsonOps;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.biome.Biome;
 import net.tslat.wgvisualizer.WorldGenVisualizer;
 import net.tslat.wgvisualizer.client.RenderUtils;
 import net.tslat.wgvisualizer.client.screen.widget.BackButton;
-import net.tslat.wgvisualizer.client.screen.widget.json.JsonFieldsHolder;
 import net.tslat.wgvisualizer.client.screen.widget.json.JsonObjectsField;
 
 public class BiomeSettingsScreen extends Screen {
@@ -24,26 +26,29 @@ public class BiomeSettingsScreen extends Screen {
 
 	private static JsonObject currentSettings = null;
 	protected static JsonObject editedSettings = null;
-
-	private JsonFieldsHolder<?> fieldsHolder;
+	private static JsonObjectsField rootWidget = null;
 
 	protected BiomeSettingsScreen() {
-		this(null);
+		this(getCurrentBiomeJson());
 	}
 
 	protected BiomeSettingsScreen(JsonObject biomeObject) {
 		super(TITLE);
 
 		if (currentSettings == null) {
+			if (biomeObject.has("features"))
+				biomeObject.remove("features");
+
+			if (biomeObject.has("starts"))
+				biomeObject.remove("starts");
+
 			currentSettings = biomeObject;
 			editedSettings = biomeObject;
 		}
-
-		this.fieldsHolder = new JsonObjectsField(null, null, editedSettings, currentSettings, new StringTextComponent(""));
 	}
 
 	protected static boolean isModified() {
-		return !currentSettings.equals(editedSettings);
+		return currentSettings != null && !currentSettings.equals(editedSettings);
 	}
 
 	@Override
@@ -60,8 +65,16 @@ public class BiomeSettingsScreen extends Screen {
 				22,
 				22,
 				new TranslationTextComponent("button." + WorldGenVisualizer.MOD_ID + ".back"),
-				button -> mc.displayGuiScreen(new WorldgenSettingsScreen(isModified()))));
-		addButton(fieldsHolder);
+				button -> {
+					if (rootWidget.visible) {
+						mc.displayGuiScreen(new WorldgenSettingsScreen(isModified()));
+					}
+					else {
+						rootWidget.upOneLevel();
+					}
+				}));
+
+		addButton(rootWidget = new JsonObjectsField(guiRootX, guiRootY + 20, null, null, currentSettings, editedSettings, new StringTextComponent(""), this::addButton).setSaveFunction(BiomeSettingsScreen::saveChanges));
 	}
 
 	@Override
@@ -85,11 +98,36 @@ public class BiomeSettingsScreen extends Screen {
 		super.render(matrixStack, mouseX, mouseY, partialTicks);
 	}
 
+	public static JsonObject saveChanges() {
+		JsonObject jsonObject;
+
+		if (rootWidget != null) {
+			jsonObject = rootWidget.getJsonValue();
+		}
+		else {
+			jsonObject = new JsonObject();
+		}
+
+		editedSettings = jsonObject;
+
+		return editedSettings;
+	}
+
 	protected static void updateSettings(JsonObject data) {
 		currentSettings = data;
 		editedSettings = data;
 
 		if (Minecraft.getInstance().currentScreen instanceof BiomeSettingsScreen)
-			((BiomeSettingsScreen)Minecraft.getInstance().currentScreen).fieldsHolder =new JsonObjectsField(null, null, editedSettings, currentSettings, new StringTextComponent(""));
+			((BiomeSettingsScreen)Minecraft.getInstance().currentScreen).init();
+	}
+
+	private static JsonObject getCurrentBiomeJson() {
+		if (Minecraft.getInstance().world == null)
+			return new JsonObject();
+
+		ClientWorld world = Minecraft.getInstance().world;
+		Biome biome = world.getBiome(Minecraft.getInstance().player.getPosition());
+
+		return Biome.CODEC.encodeStart(JsonOps.INSTANCE, biome).result().get().getAsJsonObject(); // Lol this is nasty as hell, I love it
 	}
 }

@@ -16,13 +16,15 @@ public class JsonEnumButton<T extends Enum<?>> extends ExtendedButton implements
 	private T currentValue;
 	private final TreeMap<String, T> enumMap = new TreeMap<String, T>();
 	private final String fieldId;
+	private final JsonFieldsHolder<?> parent;
 
-	public JsonEnumButton(int x, int y, String fieldId, T currentValue, T defaultValue, ITextComponent title) {
+	public JsonEnumButton(int x, int y, String fieldId, JsonFieldsHolder<?> parent, T currentValue, T defaultValue, ITextComponent title) {
 		super(x, y, JSON_WIDGET_WIDTH, JSON_WIDGET_HEIGHT, title, button -> ((JsonEnumButton<?>)button).cycleValue());
 
 		this.defaultValue = defaultValue;
 		this.currentValue = currentValue;
 		this.fieldId = fieldId;
+		this.parent = parent;
 
 		Arrays.stream(currentValue.getDeclaringClass().getEnumConstants()).forEach(value -> enumMap.put(value.toString(), (T)value));
 	}
@@ -76,5 +78,6 @@ public class JsonEnumButton<T extends Enum<?>> extends ExtendedButton implements
 		this.currentValue = value;
 
 		this.setMessage(new TranslationTextComponent("button." + WorldGenVisualizer.MOD_ID + ".enum", Operations.toTitleCase(currentValue.toString())));
+		parent.updateChanges();
 	}
 }

@@ -5,6 +5,7 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
@@ -31,21 +32,29 @@ public class WorldgenSettingsScreen extends Screen {
 	private int guiRootY;
 
 	private TextFieldWidget presetIdField;
-	private boolean hasChangedSettings;
+	private static boolean hasChangedSettings;
+	private static boolean isDirty = false;
 
 	public WorldgenSettingsScreen() {
-		this(false);
+		this(BiomeSettingsScreen.isModified() || DimensionSettingsScreen.isModified() || DimensionTypeSettingsScreen.isModified()
+			|| FeaturesSettingsScreen.isModified() || StructuresSettingsScreen.isModified() || SurfaceBuilderSettingsScreen.isModified());
 	}
 
 	public WorldgenSettingsScreen(boolean changedSettings) {
 		super(TITLE);
 
-		this.hasChangedSettings = changedSettings;
+		hasChangedSettings |= changedSettings;
 	}
 
 	@Override
 	protected void init() {
 		super.init();
+
+		if (isDirty) {
+			BiomeSettingsScreen.saveChanges();
+
+			isDirty = false;
+		}
 
 		Minecraft mc = Minecraft.getInstance();
 		guiRootX = (width - backgroundWidth) / 2;
@@ -54,7 +63,7 @@ public class WorldgenSettingsScreen extends Screen {
 
 		presetIdField = new TextFieldWidget(font, guiRootX + font.getStringPropertyWidth(text = new TranslationTextComponent("field." + WorldGenVisualizer.MOD_ID + ".presetId")) + 17, guiRootY + 25, backgroundWidth - 34 - font.getStringPropertyWidth(text), 15, new StringTextComponent("default"));
 
-		presetIdField.setText(hasChangedSettings ? "" : "default");
+		presetIdField.setText("default");
 		presetIdField.setMaxStringLength(20);
 		presetIdField.setEnableBackgroundDrawing(true);
 		presetIdField.setVisible(true);
@@ -62,6 +71,7 @@ public class WorldgenSettingsScreen extends Screen {
 		children.add(presetIdField);
 		Button applyButton;
 		Button cancelButton;
+		Widget widget;
 
 		addButton(applyButton = new ExtendedButton(
 				guiRootX + 30,
@@ -107,7 +117,7 @@ public class WorldgenSettingsScreen extends Screen {
 				new TranslationTextComponent("button." + WorldGenVisualizer.MOD_ID + ".biome"),
 				button -> mc.displayGuiScreen(new BiomeSettingsScreen()),
 				BiomeSettingsScreen::isModified));
-		addButton(new StateTrackingButton(
+		addButton(widget = new StateTrackingButton(
 				guiRootX + backgroundWidth / 2,
 				guiRootY + 71,
 				backgroundWidth / 2 - 15,
@@ -115,6 +125,9 @@ public class WorldgenSettingsScreen extends Screen {
 				new TranslationTextComponent("button." + WorldGenVisualizer.MOD_ID + ".surfaceBuilder"),
 				button -> mc.displayGuiScreen(new SurfaceBuilderSettingsScreen()),
 				SurfaceBuilderSettingsScreen::isModified));
+
+		widget.active = false;
+
 		addButton(new StateTrackingButton(
 				guiRootX + 15,
 				guiRootY + 92,
@@ -178,6 +191,8 @@ public class WorldgenSettingsScreen extends Screen {
 
 		if (data.has(GenCategory.SURFACE_BUILDER.toString()))
 			SurfaceBuilderSettingsScreen.updateSettings(data.get(GenCategory.SURFACE_BUILDER.toString()).getAsJsonObject());
+
+		isDirty = false;
 	}
 
 	private static void applySettings() {
@@ -223,6 +238,10 @@ public class WorldgenSettingsScreen extends Screen {
 
 			mc.player.sendMessage(new TranslationTextComponent("dialogue." + WorldGenVisualizer.MOD_ID + ".feedback.updateInProgress", collidedPlayer).mergeStyle(TextFormatting.RED), Util.DUMMY_UUID);
 		}
+	}
+
+	public static void markDirty() {
+		WorldgenSettingsScreen.isDirty = true;
 	}
 
 	public enum GenCategory {

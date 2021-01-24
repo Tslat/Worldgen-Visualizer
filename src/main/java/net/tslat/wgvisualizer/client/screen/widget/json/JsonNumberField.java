@@ -12,20 +12,31 @@ import java.util.regex.Pattern;
 public class JsonNumberField extends TextFieldWidget implements JsonValueWidget<JsonPrimitive> {
 	private Number defaultValue;
 	private final String fieldId;
+	private final JsonFieldsHolder<?> parent;
 
-	public JsonNumberField(FontRenderer fontRenderer, int x, int y, String fieldId, Number defaultValue, Number currentValue, ITextComponent title) {
+	public JsonNumberField(FontRenderer fontRenderer, int x, int y, String fieldId, JsonFieldsHolder<?> parent, Number defaultValue, Number currentValue, ITextComponent title) {
 		super(fontRenderer, x, y, JSON_WIDGET_WIDTH, JSON_WIDGET_HEIGHT, title);
 
 		this.defaultValue = defaultValue;
 		this.fieldId = fieldId;
+		this.parent = parent;
 
 		setText(currentValue.toString());
 		setValidator(getInputPredicate(defaultValue));
+		setTextColour(getText());
+		setResponder(this::setTextColour);
+		setCursorPosition(0);
 	}
 
-	@Override
-	public int getFGColor() {
-		return isEdited() ? 0xFF6060 : super.getFGColor();
+	private void setTextColour(String text) {
+		if (!textToNumber().equals(defaultValue)) {
+			setTextColor(0xFF6060);
+			setDisabledTextColour(0xFF6060);
+		}
+		else {
+			setTextColor(14737632);
+			setDisabledTextColour(7368816);
+		}
 	}
 
 	@Override
@@ -48,6 +59,14 @@ public class JsonNumberField extends TextFieldWidget implements JsonValueWidget<
 	@Override
 	public boolean isEdited() {
 		return !defaultValue.equals(textToNumber());
+	}
+
+	@Override
+	public void setFocused2(boolean focused) {
+		if (this.focused && !focused)
+			parent.updateChanges();
+
+		super.setFocused2(focused);
 	}
 
 	private Number textToNumber() {
