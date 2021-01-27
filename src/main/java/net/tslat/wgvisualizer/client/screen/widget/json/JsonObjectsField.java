@@ -70,16 +70,16 @@ public class JsonObjectsField extends JsonFieldsHolder<JsonObject> {
 	public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
 		if (visible) {
 			FontRenderer fontRenderer = Minecraft.getInstance().fontRenderer;
-			String truncatedBreadcrum = Operations.toTitleCase(breadcrumb);
-			int breadcrumbWidth = fontRenderer.getStringWidth(truncatedBreadcrum);
+			String truncatedBreadcrumb = Operations.toTitleCase(breadcrumb);
+			int breadcrumbWidth = fontRenderer.getStringWidth(truncatedBreadcrumb);
 
 			while (breadcrumbWidth > 240) {
-				truncatedBreadcrum = truncatedBreadcrum.replaceFirst(">", "");
-				truncatedBreadcrum = "... > " + truncatedBreadcrum.substring(truncatedBreadcrum.indexOf(">") + 2);
-				breadcrumbWidth = fontRenderer.getStringWidth("... > " + truncatedBreadcrum);
+				truncatedBreadcrumb = truncatedBreadcrumb.replaceFirst(">", "");
+				truncatedBreadcrumb = "... > " + truncatedBreadcrumb.substring(truncatedBreadcrumb.indexOf(">") + 2);
+				breadcrumbWidth = fontRenderer.getStringWidth("... > " + truncatedBreadcrumb);
 			}
 
-			fontRenderer.drawStringWithShadow(matrixStack, truncatedBreadcrum, x + 5, y - 30, 0xDDDDDD);
+			fontRenderer.drawStringWithShadow(matrixStack, truncatedBreadcrumb, x + 5, y - 30, 0xDDDDDD);
 			fillGradient(matrixStack, x, y, x + width, y + height, -1072689136, -804253680);
 
 			for (int i = 0; i < subWidgets.size(); i++) {

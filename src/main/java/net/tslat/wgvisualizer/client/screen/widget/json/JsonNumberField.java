@@ -29,7 +29,7 @@ public class JsonNumberField extends TextFieldWidget implements JsonValueWidget<
 	}
 
 	private void setTextColour(String text) {
-		if (!textToNumber().equals(defaultValue)) {
+		if (!getText().equals(defaultValue.toString())) {
 			setTextColor(0xFF6060);
 			setDisabledTextColour(0xFF6060);
 		}
@@ -58,7 +58,7 @@ public class JsonNumberField extends TextFieldWidget implements JsonValueWidget<
 
 	@Override
 	public boolean isEdited() {
-		return !defaultValue.equals(textToNumber());
+		return !defaultValue.toString().equals(getText());
 	}
 
 	@Override

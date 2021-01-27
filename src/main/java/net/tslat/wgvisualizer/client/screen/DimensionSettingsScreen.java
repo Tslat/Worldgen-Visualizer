@@ -4,11 +4,12 @@ import com.google.gson.JsonObject;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
+import net.tslat.wgvisualizer.Operations;
 import net.tslat.wgvisualizer.WorldGenVisualizer;
+import net.tslat.wgvisualizer.client.ClientOperations;
 import net.tslat.wgvisualizer.client.RenderUtils;
 import net.tslat.wgvisualizer.client.screen.widget.BackButton;
 import net.tslat.wgvisualizer.client.screen.widget.json.JsonObjectsField;
@@ -114,10 +115,9 @@ public class DimensionSettingsScreen extends Screen {
 	}
 
 	private static JsonObject getCurrentDimensionJson() {
-		if (Minecraft.getInstance().world == null)
+		if (Minecraft.getInstance().world == null || ClientOperations.currentWorldgenData == null)
 			return new JsonObject();
 
-		ClientWorld world = Minecraft.getInstance().world;
-		return new JsonObject();
+		return ClientOperations.currentWorldgenData.get(Operations.GenCategory.DIMENSION.toString()).getAsJsonObject();
 	}
 }

@@ -2,15 +2,14 @@ package net.tslat.wgvisualizer.client.screen;
 
 import com.google.gson.JsonObject;
 import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.serialization.JsonOps;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.biome.Biome;
+import net.tslat.wgvisualizer.Operations;
 import net.tslat.wgvisualizer.WorldGenVisualizer;
+import net.tslat.wgvisualizer.client.ClientOperations;
 import net.tslat.wgvisualizer.client.RenderUtils;
 import net.tslat.wgvisualizer.client.screen.widget.BackButton;
 import net.tslat.wgvisualizer.client.screen.widget.json.JsonObjectsField;
@@ -122,12 +121,9 @@ public class BiomeSettingsScreen extends Screen {
 	}
 
 	private static JsonObject getCurrentBiomeJson() {
-		if (Minecraft.getInstance().world == null)
+		if (Minecraft.getInstance().world == null || ClientOperations.currentWorldgenData == null)
 			return new JsonObject();
 
-		ClientWorld world = Minecraft.getInstance().world;
-		Biome biome = world.getBiome(Minecraft.getInstance().player.getPosition());
-
-		return Biome.CODEC.encodeStart(JsonOps.INSTANCE, biome).result().get().getAsJsonObject(); // Lol this is nasty as hell, I love it
+		return ClientOperations.currentWorldgenData.get(Operations.GenCategory.BIOME.toString()).getAsJsonObject();
 	}
 }

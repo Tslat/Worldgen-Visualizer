@@ -25,5 +25,6 @@
   "button.wgvisualizer.back": "Back",
   "button.wgvisualizer.list.open": "Open",
   "field.wgvisualizer.presetId": "Configuration ID:",
-  "dialogue.wgvisualizer.feedback.updateInProgress": "Failed to apply worldgen settings, %1$s is already updating the configuration!"
+  "message.wgvisualizer.feedback.updateInProgress": "Failed to apply worldgen settings, %1$s is already updating the configuration!",
+  "message.wgvisualizer.feedback.invalidData": "Invalid modified worldgen data provided, check server log for details. Reverting to previous known configuration."
 }

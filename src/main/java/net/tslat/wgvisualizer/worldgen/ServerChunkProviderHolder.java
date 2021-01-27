@@ -23,7 +23,7 @@ public class ServerChunkProviderHolder {
 	private static RegistryKey<World> world;
 	private static DimensionType dimType;
 	private static IChunkStatusListener chunkListener;
-	private static ChunkGenerator chunkGenerator;
+	public static ChunkGenerator chunkGenerator;
 	private static boolean isDebug;
 	private static long seed;
 	private static List<ISpecialSpawner> spawners;

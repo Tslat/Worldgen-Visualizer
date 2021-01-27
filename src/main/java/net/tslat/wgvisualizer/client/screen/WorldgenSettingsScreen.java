@@ -5,7 +5,6 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
@@ -13,12 +12,13 @@ import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.fml.client.gui.widget.ExtendedButton;
+import net.tslat.wgvisualizer.Operations;
 import net.tslat.wgvisualizer.WorldGenVisualizer;
 import net.tslat.wgvisualizer.client.RenderUtils;
 import net.tslat.wgvisualizer.client.screen.widget.StateTrackingButton;
 import net.tslat.wgvisualizer.common.network.PacketHandling;
 import net.tslat.wgvisualizer.common.network.WorldgenHandshakePacket;
-import net.tslat.wgvisualizer.common.network.WorldgenSettingsPacket;
+import net.tslat.wgvisualizer.common.network.WorldgenUpdatePacket;
 
 import javax.annotation.Nullable;
 
@@ -33,7 +33,7 @@ public class WorldgenSettingsScreen extends Screen {
 
 	private TextFieldWidget presetIdField;
 	private static boolean hasChangedSettings;
-	private static boolean isDirty = false;
+	private Button applyButton;
 
 	public WorldgenSettingsScreen() {
 		this(BiomeSettingsScreen.isModified() || DimensionSettingsScreen.isModified() || DimensionTypeSettingsScreen.isModified()
@@ -50,12 +50,6 @@ public class WorldgenSettingsScreen extends Screen {
 	protected void init() {
 		super.init();
 
-		if (isDirty) {
-			BiomeSettingsScreen.saveChanges();
-
-			isDirty = false;
-		}
-
 		Minecraft mc = Minecraft.getInstance();
 		guiRootX = (width - backgroundWidth) / 2;
 		guiRootY = (height - backgroundHeight) / 2;
@@ -69,9 +63,7 @@ public class WorldgenSettingsScreen extends Screen {
 		presetIdField.setVisible(true);
 		presetIdField.setCanLoseFocus(true);
 		children.add(presetIdField);
-		Button applyButton;
 		Button cancelButton;
-		Widget widget;
 
 		addButton(applyButton = new ExtendedButton(
 				guiRootX + 30,
@@ -117,7 +109,7 @@ public class WorldgenSettingsScreen extends Screen {
 				new TranslationTextComponent("button." + WorldGenVisualizer.MOD_ID + ".biome"),
 				button -> mc.displayGuiScreen(new BiomeSettingsScreen()),
 				BiomeSettingsScreen::isModified));
-		addButton(widget = new StateTrackingButton(
+		addButton(new StateTrackingButton(
 				guiRootX + backgroundWidth / 2,
 				guiRootY + 71,
 				backgroundWidth / 2 - 15,
@@ -125,9 +117,6 @@ public class WorldgenSettingsScreen extends Screen {
 				new TranslationTextComponent("button." + WorldGenVisualizer.MOD_ID + ".surfaceBuilder"),
 				button -> mc.displayGuiScreen(new SurfaceBuilderSettingsScreen()),
 				SurfaceBuilderSettingsScreen::isModified));
-
-		widget.active = false;
-
 		addButton(new StateTrackingButton(
 				guiRootX + 15,
 				guiRootY + 92,
@@ -162,9 +151,17 @@ public class WorldgenSettingsScreen extends Screen {
 	}
 
 	@Override
+	public boolean isPauseScreen() {
+		return false;
+	}
+
+	@Override
 	public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
 		renderBackground(matrixStack);
 		presetIdField.render(matrixStack, mouseX, mouseY, partialTicks);
+
+		if (applyButton != null)
+			applyButton.active = hasChangedSettings;
 
 		super.render(matrixStack, mouseX, mouseY, partialTicks);
 	}
@@ -174,53 +171,52 @@ public class WorldgenSettingsScreen extends Screen {
 	}
 
 	public static void updateSettings(JsonObject data) {
-		if (data.has(GenCategory.BIOME.toString()))
-			BiomeSettingsScreen.updateSettings(data.get(GenCategory.BIOME.toString()).getAsJsonObject());
+		if (data.has(Operations.GenCategory.BIOME.toString()))
+			BiomeSettingsScreen.updateSettings(data.get(Operations.GenCategory.BIOME.toString()).getAsJsonObject());
 
-		if (data.has(GenCategory.DIMENSION.toString()))
-			DimensionSettingsScreen.updateSettings(data.get(GenCategory.DIMENSION.toString()).getAsJsonObject());
+		if (data.has(Operations.GenCategory.DIMENSION.toString()))
+			DimensionSettingsScreen.updateSettings(data.get(Operations.GenCategory.DIMENSION.toString()).getAsJsonObject());
 
-		if (data.has(GenCategory.DIMENSION_TYPE.toString()))
-			DimensionTypeSettingsScreen.updateSettings(data.get(GenCategory.DIMENSION_TYPE.toString()).getAsJsonObject());
+		if (data.has(Operations.GenCategory.DIMENSION_TYPE.toString()))
+			DimensionTypeSettingsScreen.updateSettings(data.get(Operations.GenCategory.DIMENSION_TYPE.toString()).getAsJsonObject());
 
-		if (data.has(GenCategory.FEATURE.toString()))
-			FeaturesSettingsScreen.updateSettings(data.get(GenCategory.FEATURE.toString()).getAsJsonObject());
+		if (data.has(Operations.GenCategory.FEATURES.toString()))
+			FeaturesSettingsScreen.updateSettings(data.get(Operations.GenCategory.FEATURES.toString()).getAsJsonObject());
 
-		if (data.has(GenCategory.STRUCTURE.toString()))
-			StructuresSettingsScreen.updateSettings(data.get(GenCategory.STRUCTURE.toString()).getAsJsonObject());
+		if (data.has(Operations.GenCategory.STRUCTURES.toString()))
+			StructuresSettingsScreen.updateSettings(data.get(Operations.GenCategory.STRUCTURES.toString()).getAsJsonObject());
 
-		if (data.has(GenCategory.SURFACE_BUILDER.toString()))
-			SurfaceBuilderSettingsScreen.updateSettings(data.get(GenCategory.SURFACE_BUILDER.toString()).getAsJsonObject());
-
-		isDirty = false;
+		if (data.has(Operations.GenCategory.SURFACE_BUILDER.toString()))
+			SurfaceBuilderSettingsScreen.updateSettings(data.get(Operations.GenCategory.SURFACE_BUILDER.toString()).getAsJsonObject());
 	}
 
 	private static void applySettings() {
 		JsonObject data = new JsonObject();
 
 		if (BiomeSettingsScreen.isModified())
-			data.add(GenCategory.BIOME.toString(), BiomeSettingsScreen.editedSettings);
+			data.add(Operations.GenCategory.BIOME.toString(), BiomeSettingsScreen.editedSettings);
 
 		if (DimensionSettingsScreen.isModified())
-			data.add(GenCategory.DIMENSION.toString(), DimensionSettingsScreen.editedSettings);
+			data.add(Operations.GenCategory.DIMENSION.toString(), DimensionSettingsScreen.editedSettings);
 
 		if (DimensionTypeSettingsScreen.isModified())
-			data.add(GenCategory.DIMENSION_TYPE.toString(), DimensionTypeSettingsScreen.editedSettings);
+			data.add(Operations.GenCategory.DIMENSION_TYPE.toString(), DimensionTypeSettingsScreen.editedSettings);
 
 		if (FeaturesSettingsScreen.isModified())
-			data.add(GenCategory.FEATURE.toString(), FeaturesSettingsScreen.editedSettings);
+			data.add(Operations.GenCategory.FEATURES.toString(), FeaturesSettingsScreen.editedSettings);
 
 		if (StructuresSettingsScreen.isModified())
-			data.add(GenCategory.STRUCTURE.toString(), StructuresSettingsScreen.editedSettings);
+			data.add(Operations.GenCategory.STRUCTURES.toString(), StructuresSettingsScreen.editedSettings);
 
 		if (SurfaceBuilderSettingsScreen.isModified())
-			data.add(GenCategory.SURFACE_BUILDER.toString(), SurfaceBuilderSettingsScreen.editedSettings);
+			data.add(Operations.GenCategory.SURFACE_BUILDER.toString(), SurfaceBuilderSettingsScreen.editedSettings);
 
-		PacketHandling.INSTANCE.sendToServer(new WorldgenSettingsPacket(data));
+		PacketHandling.INSTANCE.sendToServer(new WorldgenUpdatePacket(data));
 	}
 
 	public void attemptToSaveSettings(Button applyButton) {
 		PacketHandling.INSTANCE.sendToServer(new WorldgenHandshakePacket());
+		closeScreen();
 	}
 
 	public static void receiveHandshakeResponse(@Nullable String collidedPlayer) {
@@ -236,20 +232,7 @@ public class WorldgenSettingsScreen extends Screen {
 			if (mc.currentScreen instanceof WorldgenSettingsScreen)
 				mc.displayGuiScreen(null);
 
-			mc.player.sendMessage(new TranslationTextComponent("dialogue." + WorldGenVisualizer.MOD_ID + ".feedback.updateInProgress", collidedPlayer).mergeStyle(TextFormatting.RED), Util.DUMMY_UUID);
+			mc.player.sendMessage(new TranslationTextComponent("message." + WorldGenVisualizer.MOD_ID + ".feedback.updateInProgress", collidedPlayer).mergeStyle(TextFormatting.RED), Util.DUMMY_UUID);
 		}
-	}
-
-	public static void markDirty() {
-		WorldgenSettingsScreen.isDirty = true;
-	}
-
-	public enum GenCategory {
-		BIOME,
-		DIMENSION,
-		DIMENSION_TYPE,
-		FEATURE,
-		STRUCTURE,
-		SURFACE_BUILDER
 	}
 }
