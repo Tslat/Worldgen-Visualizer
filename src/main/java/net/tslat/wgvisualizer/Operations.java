@@ -170,7 +170,7 @@ public final class Operations {
 			biomeJson.add("features", featuresJson);
 			biomeJson.add("starts", structuresJson);
 
-			Biome newBiome = Biome.CODEC.decode(JsonOps.INSTANCE, biomeJson).result().get().getFirst();
+			Biome newBiome = Biome.CODEC.decode(JsonOps.INSTANCE, biomeJson).resultOrPartial(msg -> {throw new IllegalArgumentException("Unable to createw new Biome based on submitted data: " + msg);}).get().getFirst();
 
 			oldBiome.climate = newBiome.climate;
 			oldBiome.biomeGenerationSettings = newBiome.biomeGenerationSettings;
@@ -183,7 +183,7 @@ public final class Operations {
 			oldDim.chunkGenerator.field_235949_c_ = new SingleBiomeProvider(oldBiome);
 			ServerChunkProviderHolder.chunkGenerator = oldDim.chunkGenerator;
 			BiomeGenerationSettings biomeSettings = oldBiome.biomeGenerationSettings;
-			ConfiguredSurfaceBuilder<?> configuredSurfaceBuilder = biomeSettings.surfaceBuilder.get().builder.func_237202_d_().decode(JsonOps.INSTANCE, currentWorldgenData.get(GenCategory.SURFACE_BUILDER.toString())).result().get().getFirst();
+			ConfiguredSurfaceBuilder<?> configuredSurfaceBuilder = biomeSettings.surfaceBuilder.get().builder.func_237202_d_().decode(JsonOps.INSTANCE, currentWorldgenData.get(GenCategory.SURFACE_BUILDER.toString())).resultOrPartial(msg -> {throw new IllegalArgumentException("Unable to build new Surface Builder config based on submitted data: " + msg);}).get().getFirst();
 			biomeSettings.surfaceBuilder = () -> configuredSurfaceBuilder;
 		}
 		catch (Exception ex) {
