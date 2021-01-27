@@ -79,13 +79,13 @@ public class WorldgenSettingsScreen extends Screen {
 				20,
 				text,
 				button -> closeScreen()));
-		addButton(new ExtendedButton(
+		/*addButton(new ExtendedButton(
 				((applyButton.x + applyButton.getWidth() + cancelButton.x) / 2) - (font.getStringPropertyWidth(text = new TranslationTextComponent("button." + WorldGenVisualizer.MOD_ID + ".save")) + 10) / 2,
 				guiRootY + backgroundHeight - 30,
 				font.getStringPropertyWidth(text) + 10,
 				20,
 				text,
-				this::saveToFiles));
+				this::saveToFiles));*/
 		addButton(new StateTrackingButton(
 				guiRootX + 15,
 				guiRootY + 50,
