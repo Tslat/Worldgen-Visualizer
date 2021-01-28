@@ -196,6 +196,8 @@ public class WorldgenSettingsScreen extends Screen {
 
 		if (data.has(Operations.GenCategory.SURFACE_BUILDER.toString()))
 			SurfaceBuilderSettingsScreen.updateSettings(data.get(Operations.GenCategory.SURFACE_BUILDER.toString()).getAsJsonObject());
+
+		hasChangedSettings = false;
 	}
 
 	private static void applySettings() {
