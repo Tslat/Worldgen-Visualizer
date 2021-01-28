@@ -8,6 +8,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.network.PacketDistributor;
 import net.tslat.wgvisualizer.Operations;
 import net.tslat.wgvisualizer.WorldGenVisualizer;
+import net.tslat.wgvisualizer.client.ClientOperations;
 import net.tslat.wgvisualizer.common.network.PacketHandling;
 import net.tslat.wgvisualizer.common.network.WorldgenSyncPacket;
 
@@ -24,6 +25,9 @@ public class Events {
 
 				PacketHandling.INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), new WorldgenSyncPacket(data));
 			}, 500, TimeUnit.MILLISECONDS);
+		}
+		else {
+			ClientOperations.handleWorldJoin();
 		}
 	}
 }

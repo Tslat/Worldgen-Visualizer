@@ -44,6 +44,12 @@ public class DimensionSettingsScreen extends Screen {
 		return currentSettings != null && !currentSettings.equals(editedSettings);
 	}
 
+	protected static void reset() {
+		currentSettings = null;
+		editedSettings = null;
+		rootWidget = null;
+	}
+
 	@Override
 	protected void init() {
 		super.init();

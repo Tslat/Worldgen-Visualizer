@@ -46,6 +46,15 @@ public class WorldgenSettingsScreen extends Screen {
 		hasChangedSettings |= changedSettings;
 	}
 
+	public static void reset() {
+		BiomeSettingsScreen.reset();
+		DimensionSettingsScreen.reset();
+		DimensionTypeSettingsScreen.reset();
+		FeaturesSettingsScreen.reset();
+		StructuresSettingsScreen.reset();
+		SurfaceBuilderSettingsScreen.reset();
+	}
+
 	@Override
 	protected void init() {
 		super.init();

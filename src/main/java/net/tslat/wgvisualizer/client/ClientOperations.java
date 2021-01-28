@@ -16,6 +16,10 @@ public class ClientOperations {
 		WorldgenSettingsScreen.updateSettings(data);
 	}
 
+	public static void handleWorldJoin() {
+		WorldgenSettingsScreen.reset();
+	}
+
 	public static void handleSettingsPreSync() {
 		ClientWorld world = Minecraft.getInstance().world;
 

@@ -88,10 +88,10 @@ public class JsonNumberField extends TextFieldWidget implements JsonValueWidget<
 
 	private Predicate<String> getInputPredicate(Number defaultValue) {
 		if (defaultValue instanceof Integer || defaultValue instanceof Long || defaultValue instanceof Byte) {
-			return string -> Pattern.compile("^(0|(-?[1-9]+[0-9]*))$").matcher(string).find();
+			return string -> string.isEmpty() || Pattern.compile("^(0|(-?[1-9]+[0-9]*))$").matcher(string).find();
 		}
 		else {
-			return string -> Pattern.compile("^(-?[0-9]+(\\.?[0-9]*)?)$").matcher(string).find();
+			return string -> string.isEmpty() || Pattern.compile("^(-?[0-9]+(\\.?[0-9]*)?)$").matcher(string).find();
 		}
 	}
 }
