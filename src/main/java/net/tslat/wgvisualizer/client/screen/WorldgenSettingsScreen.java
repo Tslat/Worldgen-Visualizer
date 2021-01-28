@@ -43,7 +43,7 @@ public class WorldgenSettingsScreen extends Screen {
 	public WorldgenSettingsScreen(boolean changedSettings) {
 		super(TITLE);
 
-		hasChangedSettings |= changedSettings;
+		hasChangedSettings = changedSettings || hasChangedSettings;
 	}
 
 	public static void reset() {
