@@ -70,6 +70,12 @@ public class JsonNumberField extends TextFieldWidget implements JsonValueWidget<
 	}
 
 	private Number textToNumber() {
+		if (getText().equals("-")) {
+			setText("0");
+
+			return 0;
+		}
+
 		if (defaultValue instanceof Double) {
 			return Double.parseDouble(getText());
 		}
@@ -91,10 +97,10 @@ public class JsonNumberField extends TextFieldWidget implements JsonValueWidget<
 
 	private Predicate<String> getInputPredicate(Number defaultValue) {
 		if (defaultValue instanceof Integer || defaultValue instanceof Long || defaultValue instanceof Byte) {
-			return string -> string.isEmpty() || Pattern.compile("^(0|(-?[1-9]+[0-9]*))$").matcher(string).find();
+			return string -> string.isEmpty() || Pattern.compile("^-|(0|(-?[1-9]+[0-9]*))$").matcher(string).find();
 		}
 		else {
-			return string -> string.isEmpty() || Pattern.compile("^(-?[0-9]+(\\.?[0-9]*)?)$").matcher(string).find();
+			return string -> string.isEmpty() || Pattern.compile("^-|(-?[0-9]+(\\.?[0-9]*)?)$").matcher(string).find();
 		}
 	}
 }
