@@ -72,7 +72,6 @@ public class WorldgenSettingsScreen extends Screen {
 		presetIdField.setVisible(true);
 		presetIdField.setCanLoseFocus(true);
 		children.add(presetIdField);
-		Button cancelButton;
 
 		addButton(applyButton = new ExtendedButton(
 				guiRootX + 30,
