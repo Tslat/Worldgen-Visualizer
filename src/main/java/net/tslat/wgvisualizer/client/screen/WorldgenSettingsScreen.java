@@ -80,7 +80,7 @@ public class WorldgenSettingsScreen extends Screen {
 				20,
 				text,
 				this::attemptToSaveSettings));
-		addButton(cancelButton = new ExtendedButton(
+		addButton(new ExtendedButton(
 				guiRootX + backgroundWidth - 40 - font.getStringPropertyWidth(text = new TranslationTextComponent("button." + WorldGenVisualizer.MOD_ID + ".cancel")) - 10,
 				guiRootY + backgroundHeight - 30,
 				font.getStringPropertyWidth(text) + 10,
