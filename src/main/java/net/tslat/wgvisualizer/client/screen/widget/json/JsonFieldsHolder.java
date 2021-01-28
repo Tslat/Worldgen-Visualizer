@@ -128,8 +128,9 @@ public abstract class JsonFieldsHolder<T extends JsonElement> extends Widget imp
 	@Override
 	public boolean mouseClicked(double mouseX, double mouseY, int button) {
 		if (active && visible) {
-			if (isValidClickButton(button) && clicked(mouseX, mouseY)) {
-				onClick(mouseX, mouseY);
+			if (isValidClickButton(button)) {
+				if (clicked(mouseX, mouseY))
+					onClick(mouseX, mouseY);
 
 				for (JsonValueWidget<?> jsonWidget : subWidgets) {
 					((Widget)jsonWidget).mouseClicked(mouseX, mouseY, button);
