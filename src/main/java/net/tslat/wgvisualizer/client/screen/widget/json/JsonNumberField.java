@@ -70,7 +70,7 @@ public class JsonNumberField extends TextFieldWidget implements JsonValueWidget<
 	}
 
 	private Number textToNumber() {
-		if (getText().equals("-")) {
+		if (getText().equals("-") || getText().isEmpty()) {
 			setText("0");
 
 			return 0;
