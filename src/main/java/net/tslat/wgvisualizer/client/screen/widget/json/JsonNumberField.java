@@ -79,17 +79,11 @@ public class JsonNumberField extends TextFieldWidget implements JsonValueWidget<
 		if (defaultValue instanceof Double) {
 			return Double.parseDouble(getText());
 		}
-		else if (defaultValue instanceof Integer) {
-			return Integer.parseInt(getText());
-		}
 		else if (defaultValue instanceof Float) {
 			return Float.parseFloat(getText());
 		}
-		else if (defaultValue instanceof Byte) {
-			return Byte.parseByte(getText());
-		}
-		else if (defaultValue instanceof Short) {
-			return Short.parseShort(getText());
+		else if (defaultValue instanceof Integer || defaultValue instanceof Short || defaultValue instanceof Byte) {
+			return Integer.parseInt(getText());
 		}
 
 		return 0;
