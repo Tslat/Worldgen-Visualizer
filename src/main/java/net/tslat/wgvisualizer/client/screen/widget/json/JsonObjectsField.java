@@ -21,6 +21,7 @@ import java.util.function.Supplier;
 public class JsonObjectsField extends JsonFieldsHolder<JsonObject> {
 	private static final ResourceLocation ARROWS_TEXTURE = new ResourceLocation("textures/gui/server_selection.png");
 	protected Supplier<JsonObject> rootSaveFunction;
+	private final ArrayList<String> breadcrumb;
 
 	public JsonObjectsField(int x, int y, String fieldId, JsonFieldsHolder<?> parent, JsonObject defaultValues, JsonObject currentValues, ITextComponent title, Consumer<JsonFieldsHolder<?>> swapConsumer) {
 		super(x, y, parent, fieldId, title, swapConsumer);
@@ -35,6 +36,8 @@ public class JsonObjectsField extends JsonFieldsHolder<JsonObject> {
 
 			yOffset += 20;
 		}
+
+		breadcrumb = JsonFieldOperations.createBreadcrumb(Minecraft.getInstance().fontRenderer, getFieldPath());
 	}
 
 	public void tickWidget() {
@@ -76,16 +79,14 @@ public class JsonObjectsField extends JsonFieldsHolder<JsonObject> {
 	public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
 		if (visible) {
 			FontRenderer fontRenderer = Minecraft.getInstance().fontRenderer;
-			String truncatedBreadcrumb = Operations.toTitleCase(breadcrumb);
-			int breadcrumbWidth = fontRenderer.getStringWidth(truncatedBreadcrumb);
+			int breadcrumbYOffset = -10 * breadcrumb.size() + 10;
 
-			while (breadcrumbWidth > 240) {
-				truncatedBreadcrumb = truncatedBreadcrumb.replaceFirst(">", "");
-				truncatedBreadcrumb = "... > " + truncatedBreadcrumb.substring(truncatedBreadcrumb.indexOf(">") + 2);
-				breadcrumbWidth = fontRenderer.getStringWidth("... > " + truncatedBreadcrumb);
+			for (String line : breadcrumb) {
+				fontRenderer.drawStringWithShadow(matrixStack, line, x + 5, y - 30 + breadcrumbYOffset, 0xDDDDDD);
+
+				breadcrumbYOffset += 10;
 			}
 
-			fontRenderer.drawStringWithShadow(matrixStack, truncatedBreadcrumb, x + 5, y - 30, 0xDDDDDD);
 			fillGradient(matrixStack, x, y, x + width, y + height, -1072689136, -804253680);
 
 			for (int i = 0; i < subWidgets.size(); i++) {

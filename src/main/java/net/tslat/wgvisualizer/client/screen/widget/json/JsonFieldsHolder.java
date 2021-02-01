@@ -17,8 +17,8 @@ public abstract class JsonFieldsHolder<T extends JsonElement> extends Widget imp
 	@Nullable
 	public final JsonFieldsHolder<?> parent;
 	private final String fieldId;
+	private final String fieldPath;
 	protected final Consumer<JsonFieldsHolder<?>> buttonAddFunction;
-	protected static String breadcrumb = "> ";
 
 	protected float scrollAmount = 0;
 
@@ -27,10 +27,13 @@ public abstract class JsonFieldsHolder<T extends JsonElement> extends Widget imp
 
 		this.fieldId = fieldId;
 		this.parent = parent;
+		this.fieldPath = parent != null ? parent.getFieldPath() + "." + fieldId : fieldId;
 		this.buttonAddFunction = buttonAddFunction;
+	}
 
-		if (fieldId == null)
-			breadcrumb = "> ";
+	@Override
+	public String getFieldPath() {
+		return this.fieldPath;
 	}
 
 	protected boolean isEmpty() {
@@ -73,10 +76,8 @@ public abstract class JsonFieldsHolder<T extends JsonElement> extends Widget imp
 					((TextFieldWidget)jsonWidget).setFocused2(false);
 			}
 
-			if (parent != null) {
+			if (parent != null)
 				parent.visible = true;
-				breadcrumb = breadcrumb.substring(0, breadcrumb.length() - (fieldId.length() + 3));
-			}
 
 			visible = false;
 

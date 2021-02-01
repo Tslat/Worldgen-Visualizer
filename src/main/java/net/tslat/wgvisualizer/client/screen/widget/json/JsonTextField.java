@@ -9,6 +9,7 @@ import net.tslat.wgvisualizer.client.screen.widget.JsonValueWidget;
 public class JsonTextField extends TextFieldWidget implements JsonValueWidget<JsonPrimitive> {
 	private String defaultValue;
 	private final String fieldId;
+	private final String fieldPath;
 	private final JsonFieldsHolder<?> parent;
 
 	public JsonTextField(FontRenderer fontRenderer, int x, int y, String fieldId, JsonFieldsHolder<?> parent, String defaultValue, String currentValue, ITextComponent title) {
@@ -16,6 +17,7 @@ public class JsonTextField extends TextFieldWidget implements JsonValueWidget<Js
 
 		this.defaultValue = defaultValue;
 		this.fieldId = fieldId;
+		this.fieldPath = parent.getFieldPath() + "." + fieldId;
 		this.parent = parent;
 
 		setMaxStringLength(100);
@@ -28,6 +30,11 @@ public class JsonTextField extends TextFieldWidget implements JsonValueWidget<Js
 	@Override
 	public void tickWidget() {
 		super.tick();
+	}
+
+	@Override
+	public String getFieldPath() {
+		return this.fieldPath;
 	}
 
 	private void setTextColour(String text) {

@@ -11,7 +11,6 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
-import net.tslat.wgvisualizer.Operations;
 import net.tslat.wgvisualizer.WorldGenVisualizer;
 import net.tslat.wgvisualizer.client.RenderUtils;
 import net.tslat.wgvisualizer.client.screen.widget.JsonValueWidget;
@@ -21,6 +20,7 @@ import java.util.function.Consumer;
 
 public class JsonListField extends JsonFieldsHolder<JsonArray> {
 	private static final ResourceLocation ARROWS_TEXTURE = new ResourceLocation("textures/gui/server_selection.png");
+	private final ArrayList<String> breadcrumb;
 
 	public JsonListField(int x, int y, String fieldId, JsonFieldsHolder<?> parent, JsonArray defaultValues, JsonArray currentValues, ITextComponent title, Consumer<JsonFieldsHolder<?>> swapConsumer) {
 		super(x, y, parent, fieldId, title, swapConsumer);
@@ -31,6 +31,8 @@ public class JsonListField extends JsonFieldsHolder<JsonArray> {
 
 			subWidgets.add(JsonFieldOperations.jsonToWidget(x + width - 105, y + 5 + 20 * i, String.valueOf(i), defaultElement, currentElement, this));
 		}
+
+		breadcrumb = JsonFieldOperations.createBreadcrumb(Minecraft.getInstance().fontRenderer, getFieldPath());
 	}
 
 	@Override
@@ -66,17 +68,14 @@ public class JsonListField extends JsonFieldsHolder<JsonArray> {
 	public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
 		if (visible) {
 			FontRenderer fontRenderer = Minecraft.getInstance().fontRenderer;
-			String truncatedBreadcrumb = Operations.toTitleCase(breadcrumb);
-			int breadcrumbWidth = fontRenderer.getStringWidth(truncatedBreadcrumb);
 			String openText = I18n.format("button." + WorldGenVisualizer.MOD_ID + ".list.open");
+			int breadcrumbYOffset = -10 * breadcrumb.size() + 10;
 
-			while (breadcrumbWidth > 240) {
-				truncatedBreadcrumb = truncatedBreadcrumb.replaceFirst(">", "");
-				truncatedBreadcrumb = "... > " + truncatedBreadcrumb.substring(truncatedBreadcrumb.indexOf(">") + 2);
-				breadcrumbWidth = fontRenderer.getStringWidth("... > " + truncatedBreadcrumb);
+			for (String line : breadcrumb) {
+				fontRenderer.drawStringWithShadow(matrixStack, line, x + 5, y - 30 + breadcrumbYOffset, 0xDDDDDD);
+
+				breadcrumbYOffset += 10;
 			}
-
-			fontRenderer.drawStringWithShadow(matrixStack, truncatedBreadcrumb, x + 5, y - 30, 0xDDDDDD);
 			fillGradient(matrixStack, x, y, x + width, y + height, -1072689136, -804253680);
 
 			for (int i = 0; i < subWidgets.size(); i++) {

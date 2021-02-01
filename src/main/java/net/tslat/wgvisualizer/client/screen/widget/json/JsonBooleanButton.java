@@ -12,6 +12,7 @@ public class JsonBooleanButton extends ExtendedButton implements JsonValueWidget
 	private boolean state;
 
 	private final String fieldId;
+	private final String fieldPath;
 	private final JsonFieldsHolder<?> parent;
 
 	public JsonBooleanButton(int x, int y, String fieldId, JsonFieldsHolder<?> parent, boolean defaultState, boolean currentState, ITextComponent title) {
@@ -20,12 +21,18 @@ public class JsonBooleanButton extends ExtendedButton implements JsonValueWidget
 		this.defaultState = defaultState;
 		this.state = currentState;
 		this.fieldId = fieldId;
+		this.fieldPath = parent.getFieldPath() + "." + fieldId;
 		this.parent = parent;
 	}
 
 	@Override
 	public int getFGColor() {
 		return isEdited() ? 0xFF6060 : super.getFGColor();
+	}
+
+	@Override
+	public String getFieldPath() {
+		return this.fieldPath;
 	}
 
 	@Override

@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
@@ -79,7 +80,7 @@ public class SurfaceBuilderSettingsScreen extends Screen {
 					}
 				}));
 
-		addButton(rootWidget = new JsonObjectsField(guiRootX, guiRootY + 20, null, null, currentSettings, editedSettings, new StringTextComponent(""), this::addButton).setSaveFunction(SurfaceBuilderSettingsScreen::saveChanges));
+		addButton(rootWidget = new JsonObjectsField(guiRootX, guiRootY + 20, I18n.format(TITLE.getKey()), null, currentSettings, editedSettings, new StringTextComponent(""), this::addButton).setSaveFunction(SurfaceBuilderSettingsScreen::saveChanges));
 	}
 
 	@Override

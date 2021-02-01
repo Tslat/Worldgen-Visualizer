@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
 public class JsonNumberField extends TextFieldWidget implements JsonValueWidget<JsonPrimitive> {
 	private Number defaultValue;
 	private final String fieldId;
+	private final String fieldPath;
 	private final JsonFieldsHolder<?> parent;
 
 	public JsonNumberField(FontRenderer fontRenderer, int x, int y, String fieldId, JsonFieldsHolder<?> parent, Number defaultValue, Number currentValue, ITextComponent title) {
@@ -19,6 +20,7 @@ public class JsonNumberField extends TextFieldWidget implements JsonValueWidget<
 
 		this.defaultValue = defaultValue;
 		this.fieldId = fieldId;
+		this.fieldPath = parent.getFieldPath() + "." + fieldId;
 		this.parent = parent;
 
 		setText(currentValue.toString());
@@ -37,6 +39,11 @@ public class JsonNumberField extends TextFieldWidget implements JsonValueWidget<
 			setTextColor(14737632);
 			setDisabledTextColour(7368816);
 		}
+	}
+
+	@Override
+	public String getFieldPath() {
+		return this.fieldPath;
 	}
 
 	@Override

@@ -19,4 +19,6 @@ public interface JsonValueWidget<T extends JsonElement> {
 	}
 
 	default void tickWidget() {}
+
+	String getFieldPath();
 }

@@ -16,6 +16,7 @@ public class JsonEnumButton<T extends Enum<?>> extends ExtendedButton implements
 	private T currentValue;
 	private final TreeMap<String, T> enumMap = new TreeMap<String, T>();
 	private final String fieldId;
+	private final String fieldPath;
 	private final JsonFieldsHolder<?> parent;
 
 	public JsonEnumButton(int x, int y, String fieldId, JsonFieldsHolder<?> parent, T currentValue, T defaultValue, ITextComponent title) {
@@ -24,6 +25,7 @@ public class JsonEnumButton<T extends Enum<?>> extends ExtendedButton implements
 		this.defaultValue = defaultValue;
 		this.currentValue = currentValue;
 		this.fieldId = fieldId;
+		this.fieldPath = parent.getFieldPath() + "." + fieldId;
 		this.parent = parent;
 
 		Arrays.stream(currentValue.getDeclaringClass().getEnumConstants()).forEach(value -> enumMap.put(value.toString(), (T)value));
@@ -32,6 +34,11 @@ public class JsonEnumButton<T extends Enum<?>> extends ExtendedButton implements
 	@Override
 	public int getFGColor() {
 		return isEdited() ? 0xFF6060 : super.getFGColor();
+	}
+
+	@Override
+	public String getFieldPath() {
+		return this.fieldPath;
 	}
 
 	@Override

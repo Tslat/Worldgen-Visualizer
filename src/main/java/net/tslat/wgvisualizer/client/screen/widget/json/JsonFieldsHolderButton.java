@@ -13,7 +13,6 @@ public class JsonFieldsHolderButton<T extends JsonElement> extends ExtendedButto
 	public JsonFieldsHolderButton(int x, int y, String fieldId, JsonFieldsHolder<T> data, ITextComponent title) {
 		super(x, y, JSON_WIDGET_WIDTH, JSON_WIDGET_HEIGHT, title, button -> {
 			data.visible = true;
-			JsonFieldsHolder.breadcrumb += fieldId + " > ";
 
 			if (data.parent != null)
 				data.parent.visible = false;
@@ -36,6 +35,11 @@ public class JsonFieldsHolderButton<T extends JsonElement> extends ExtendedButto
 				}
 			}
 		}
+	}
+
+	@Override
+	public String getFieldPath() {
+		return subData.getFieldPath();
 	}
 
 	@Override

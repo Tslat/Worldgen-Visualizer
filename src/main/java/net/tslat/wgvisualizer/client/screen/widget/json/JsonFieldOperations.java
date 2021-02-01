@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.tslat.wgvisualizer.Operations;
@@ -165,5 +166,41 @@ public final class JsonFieldOperations {
 		}
 
 		return new JsonBooleanButton(x, y, fieldId, parent, false, false, new TranslationTextComponent("button." + WorldGenVisualizer.MOD_ID + ".boolean." + false));
+	}
+
+	public static ArrayList<String> createBreadcrumb(FontRenderer fontRenderer, String fieldPath) {
+		ArrayList<String> newBreadcrumb = new ArrayList<String>();
+		String rawString = Operations.toTitleCase(fieldPath).replaceAll("\\.", " > ");
+
+		while (newBreadcrumb.isEmpty() || fontRenderer.getStringWidth(newBreadcrumb.get(newBreadcrumb.size() - 1)) > 240) {
+			if (newBreadcrumb.size() >= 3) {
+				newBreadcrumb.clear();
+
+				rawString = rawString.replaceFirst(">", "");
+				rawString = "... > " + rawString.substring(rawString.indexOf(">") + 2);
+			}
+			else {
+				StringBuilder builder = new StringBuilder();
+				String[] splitString = rawString.split(" > ");
+
+				for (String crumb : splitString) {
+					String fancyCrumb = Operations.toTitleCase(crumb);
+
+					if (fontRenderer.getStringWidth(builder.toString() + fancyCrumb + " > ") > 240) {
+						newBreadcrumb.add(builder.toString() + " >");
+
+						builder = new StringBuilder();
+						builder.append(fancyCrumb);
+					}
+					else {
+						builder.append(" > ").append(fancyCrumb);
+					}
+				}
+
+				newBreadcrumb.add(builder.toString());
+			}
+		}
+
+		return newBreadcrumb;
 	}
 }
