@@ -17,4 +17,6 @@ public interface JsonValueWidget<T extends JsonElement> {
 	default int getElementHeight() {
 		return 15;
 	}
+
+	default void tickWidget() {}
 }

@@ -51,6 +51,12 @@ public class StructuresSettingsScreen extends Screen {
 	}
 
 	@Override
+	public void tick() {
+		if (rootWidget != null)
+			rootWidget.tickWidget();
+	}
+
+	@Override
 	protected void init() {
 		super.init();
 

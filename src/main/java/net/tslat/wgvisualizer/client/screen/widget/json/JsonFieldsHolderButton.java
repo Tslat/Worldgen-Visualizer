@@ -39,6 +39,12 @@ public class JsonFieldsHolderButton<T extends JsonElement> extends ExtendedButto
 	}
 
 	@Override
+	public void tickWidget() {
+		if (subData != null)
+			subData.tickWidget();
+	}
+
+	@Override
 	public int getFGColor() {
 		return isEdited() ? 0xFF6060 : super.getFGColor();
 	}

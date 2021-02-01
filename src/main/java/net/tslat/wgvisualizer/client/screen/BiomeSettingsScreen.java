@@ -46,6 +46,12 @@ public class BiomeSettingsScreen extends Screen {
 		}
 	}
 
+	@Override
+	public void tick() {
+		if (rootWidget != null)
+			rootWidget.tickWidget();
+	}
+
 	protected static boolean isModified() {
 		return currentSettings != null && !currentSettings.equals(editedSettings);
 	}

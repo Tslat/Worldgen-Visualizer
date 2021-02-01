@@ -56,6 +56,12 @@ public class WorldgenSettingsScreen extends Screen {
 	}
 
 	@Override
+	public void tick() {
+		if (presetIdField != null)
+			presetIdField.tick();
+	}
+
+	@Override
 	protected void init() {
 		super.init();
 

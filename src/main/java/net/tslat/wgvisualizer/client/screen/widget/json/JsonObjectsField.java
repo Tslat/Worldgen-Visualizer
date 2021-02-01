@@ -37,6 +37,12 @@ public class JsonObjectsField extends JsonFieldsHolder<JsonObject> {
 		}
 	}
 
+	public void tickWidget() {
+		for (JsonValueWidget<?> jsonWidget : subWidgets) {
+			jsonWidget.tickWidget();
+		}
+	}
+
 	public JsonObjectsField setSaveFunction(Supplier<JsonObject> rootSaveFunction) {
 		this.rootSaveFunction = rootSaveFunction;
 

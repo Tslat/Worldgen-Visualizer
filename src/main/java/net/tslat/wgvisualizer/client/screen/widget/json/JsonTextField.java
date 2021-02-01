@@ -25,6 +25,11 @@ public class JsonTextField extends TextFieldWidget implements JsonValueWidget<Js
 		setCursorPosition(0);
 	}
 
+	@Override
+	public void tickWidget() {
+		super.tick();
+	}
+
 	private void setTextColour(String text) {
 		if (!getText().equals(defaultValue)) {
 			setTextColor(0xFF6060);

@@ -34,6 +34,13 @@ public class JsonListField extends JsonFieldsHolder<JsonArray> {
 	}
 
 	@Override
+	public void tickWidget() {
+		for (JsonValueWidget<?> widget : subWidgets) {
+			widget.tickWidget();
+		}
+	}
+
+	@Override
 	public void updateValue(JsonArray value) {
 		subWidgets = new ArrayList<JsonValueWidget<?>>();
 

@@ -40,6 +40,11 @@ public class JsonNumberField extends TextFieldWidget implements JsonValueWidget<
 	}
 
 	@Override
+	public void tickWidget() {
+		super.tick();
+	}
+
+	@Override
 	public String getFieldId() {
 		return fieldId;
 	}
