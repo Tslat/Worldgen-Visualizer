@@ -80,4 +80,9 @@ public class JsonEnumButton<T extends Enum<?>> extends ExtendedButton implements
 		this.setMessage(new TranslationTextComponent("button." + WorldGenVisualizer.MOD_ID + ".enum", Operations.toTitleCase(currentValue.toString())));
 		parent.updateChanges();
 	}
+
+	@Override
+	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+		return false;
+	}
 }

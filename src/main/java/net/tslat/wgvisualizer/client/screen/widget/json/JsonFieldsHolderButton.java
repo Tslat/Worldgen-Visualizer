@@ -68,4 +68,9 @@ public class JsonFieldsHolderButton<T extends JsonElement> extends ExtendedButto
 	public String getFieldId() {
 		return this.fieldId;
 	}
+
+	@Override
+	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+		return false;
+	}
 }

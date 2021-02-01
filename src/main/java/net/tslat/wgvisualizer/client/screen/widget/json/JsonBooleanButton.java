@@ -55,4 +55,9 @@ public class JsonBooleanButton extends ExtendedButton implements JsonValueWidget
 		this.setMessage(new TranslationTextComponent("button." + WorldGenVisualizer.MOD_ID + ".boolean." + state));
 		parent.updateChanges();
 	}
+
+	@Override
+	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+		return false;
+	}
 }
