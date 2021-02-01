@@ -1,6 +1,7 @@
 package net.tslat.wgvisualizer.client.screen.widget.json;
 
 import com.google.gson.JsonElement;
+import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
@@ -67,6 +68,11 @@ public abstract class JsonFieldsHolder<T extends JsonElement> extends Widget imp
 
 	public void upOneLevel() {
 		if (visible) {
+			for (JsonValueWidget<?> jsonWidget : subWidgets) {
+				if (jsonWidget instanceof TextFieldWidget)
+					((TextFieldWidget)jsonWidget).setFocused2(false);
+			}
+
 			if (parent != null) {
 				parent.visible = true;
 				breadcrumb = breadcrumb.substring(0, breadcrumb.length() - (fieldId.length() + 3));
