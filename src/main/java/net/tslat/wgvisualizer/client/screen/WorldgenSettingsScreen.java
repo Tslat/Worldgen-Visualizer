@@ -65,7 +65,7 @@ public class WorldgenSettingsScreen extends Screen {
 	protected void init() {
 		super.init();
 
-		Minecraft mc = Minecraft.getInstance();
+		minecraft.keyboardListener.enableRepeatEvents(true);
 		guiRootX = (width - backgroundWidth) / 2;
 		guiRootY = (height - backgroundHeight) / 2;
 		TranslationTextComponent text;
@@ -105,7 +105,7 @@ public class WorldgenSettingsScreen extends Screen {
 				guiRootY + 50,
 				backgroundWidth / 2 - 15,
 				20, new TranslationTextComponent("button." + WorldGenVisualizer.MOD_ID + ".dimension"),
-				button -> mc.displayGuiScreen(new DimensionSettingsScreen()),
+				button -> minecraft.displayGuiScreen(new DimensionSettingsScreen()),
 				DimensionSettingsScreen::isModified));
 		addButton(new StateTrackingButton(
 				guiRootX + backgroundWidth / 2,
@@ -113,7 +113,7 @@ public class WorldgenSettingsScreen extends Screen {
 				backgroundWidth / 2 - 15,
 				20,
 				new TranslationTextComponent("button." + WorldGenVisualizer.MOD_ID + ".dimensionType"),
-				button -> mc.displayGuiScreen(new DimensionTypeSettingsScreen()),
+				button -> minecraft.displayGuiScreen(new DimensionTypeSettingsScreen()),
 				DimensionTypeSettingsScreen::isModified));
 		addButton(new StateTrackingButton(
 				guiRootX + 15,
@@ -121,7 +121,7 @@ public class WorldgenSettingsScreen extends Screen {
 				backgroundWidth / 2 - 15,
 				20,
 				new TranslationTextComponent("button." + WorldGenVisualizer.MOD_ID + ".biome"),
-				button -> mc.displayGuiScreen(new BiomeSettingsScreen()),
+				button -> minecraft.displayGuiScreen(new BiomeSettingsScreen()),
 				BiomeSettingsScreen::isModified));
 		addButton(new StateTrackingButton(
 				guiRootX + backgroundWidth / 2,
@@ -129,7 +129,7 @@ public class WorldgenSettingsScreen extends Screen {
 				backgroundWidth / 2 - 15,
 				20,
 				new TranslationTextComponent("button." + WorldGenVisualizer.MOD_ID + ".surfaceBuilder"),
-				button -> mc.displayGuiScreen(new SurfaceBuilderSettingsScreen()),
+				button -> minecraft.displayGuiScreen(new SurfaceBuilderSettingsScreen()),
 				SurfaceBuilderSettingsScreen::isModified));
 		addButton(new StateTrackingButton(
 				guiRootX + 15,
@@ -137,7 +137,7 @@ public class WorldgenSettingsScreen extends Screen {
 				backgroundWidth / 2 - 15,
 				20,
 				new TranslationTextComponent("button." + WorldGenVisualizer.MOD_ID + ".features"),
-				button -> mc.displayGuiScreen(new FeaturesSettingsScreen()),
+				button -> minecraft.displayGuiScreen(new FeaturesSettingsScreen()),
 				FeaturesSettingsScreen::isModified));
 		addButton(new StateTrackingButton(
 				guiRootX + backgroundWidth / 2,
@@ -145,7 +145,7 @@ public class WorldgenSettingsScreen extends Screen {
 				backgroundWidth / 2 - 15,
 				20,
 				new TranslationTextComponent("button." + WorldGenVisualizer.MOD_ID + ".structures"),
-				button -> mc.displayGuiScreen(new StructuresSettingsScreen()),
+				button -> minecraft.displayGuiScreen(new StructuresSettingsScreen()),
 				StructuresSettingsScreen::isModified));
 	}
 
