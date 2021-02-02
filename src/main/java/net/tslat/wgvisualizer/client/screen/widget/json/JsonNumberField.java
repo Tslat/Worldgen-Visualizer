@@ -77,6 +77,9 @@ public class JsonNumberField extends TextFieldWidget implements JsonValueWidget<
 
 	@Override
 	public JsonPrimitive getJsonValue() {
+		if (!getInputPredicate(defaultValue, true).test(getText()))
+			setText(defaultValue.toString());
+
 		return new JsonPrimitive(textToNumber());
 	}
 
@@ -98,12 +101,6 @@ public class JsonNumberField extends TextFieldWidget implements JsonValueWidget<
 	}
 
 	private Number textToNumber() {
-		if (getText().equals("-") || getText().isEmpty()) {
-			setText("0");
-
-			return 0;
-		}
-
 		if (defaultValue instanceof Double) {
 			return Double.parseDouble(getText());
 		}
