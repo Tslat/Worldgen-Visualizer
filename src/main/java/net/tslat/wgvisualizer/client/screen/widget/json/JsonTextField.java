@@ -77,8 +77,12 @@ public class JsonTextField extends TextFieldWidget implements JsonValueWidget<Js
 
 	@Override
 	public void setFocused2(boolean focused) {
-		if (this.focused && !focused)
+		if (this.focused && !focused) {
 			parent.updateChanges();
+
+			if (getText().isEmpty())
+				setText(defaultValue);
+		}
 
 		super.setFocused2(focused);
 	}

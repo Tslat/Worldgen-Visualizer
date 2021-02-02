@@ -6,10 +6,21 @@ import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.util.text.ITextComponent;
 import net.tslat.wgvisualizer.client.screen.widget.JsonValueWidget;
 
+import java.math.BigDecimal;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 public class JsonNumberField extends TextFieldWidget implements JsonValueWidget<JsonPrimitive> {
+	private static final Pattern WHOLE_NUMBER_PATTERN = Pattern.compile("^(-?[1-9]+[0-9]*)$");
+	private static final Pattern DECIMAL_NUMBER_PATTERN = Pattern.compile("^(-?[0-9]+(\\.?[0-9]*)?)$");
+	private static final Pattern PARTIAL_DECIMAL_NUMBER_PATTERN = Pattern.compile("^(-|(-?[0-9]+\\.?0*))$");
+
+	private static final Predicate<String> INTEGER_FORMAT_PREDICATE = integerPredicate(false);
+	private static final Predicate<String> LONG_FORMAT_PREDICATE = longPredicate(false);
+	private static final Predicate<String> BYTE_FORMAT_PREDICATE = bytePredicate(false);
+	private static final Predicate<String> FLOAT_FORMAT_PREDICATE = floatPredicate(false);
+	private static final Predicate<String> DOUBLE_FORMAT_PREDICATE = doublePredicate(false);
+
 	private Number defaultValue;
 	private final String fieldId;
 	private final String fieldPath;
@@ -24,7 +35,7 @@ public class JsonNumberField extends TextFieldWidget implements JsonValueWidget<
 		this.parent = parent;
 
 		setText(currentValue.toString());
-		setValidator(getInputPredicate(defaultValue));
+		setValidator(getInputPredicate(defaultValue, false));
 		setTextColour(getText());
 		setResponder(this::setTextColour);
 		setCursorPosition(0);
@@ -75,8 +86,12 @@ public class JsonNumberField extends TextFieldWidget implements JsonValueWidget<
 
 	@Override
 	public void setFocused2(boolean focused) {
-		if (this.focused && !focused)
+		if (this.focused && !focused) {
+			if (!getInputPredicate(defaultValue, true).test(getText()))
+				setText(defaultValue.toString());
+
 			parent.updateChanges();
+		}
 
 		super.setFocused2(focused);
 	}
@@ -101,12 +116,103 @@ public class JsonNumberField extends TextFieldWidget implements JsonValueWidget<
 		return 0;
 	}
 
-	private Predicate<String> getInputPredicate(Number defaultValue) {
-		if (defaultValue instanceof Integer || defaultValue instanceof Long || defaultValue instanceof Byte) {
-			return string -> string.isEmpty() || Pattern.compile("^-|(0|(-?[1-9]+[0-9]*))$").matcher(string).find();
+	private static Predicate<String> integerPredicate(boolean isExitingField) {
+		Predicate<String> predicate = isExitingField ? value -> false : value -> value.isEmpty() || value.equals("-") || value.equals("0");
+
+		return predicate.or(value -> {
+			if (!WHOLE_NUMBER_PATTERN.matcher(value).find())
+				return false;
+
+			BigDecimal numericValue = new BigDecimal(value);
+
+			if (numericValue.compareTo(BigDecimal.valueOf(Integer.MAX_VALUE)) > 0)
+				return false;
+
+			return numericValue.compareTo(BigDecimal.valueOf(Integer.MIN_VALUE)) >= 0;
+		});
+	}
+
+	private static Predicate<String> longPredicate(boolean isExitingField) {
+		Predicate<String> predicate = isExitingField ? value -> false : value -> value.isEmpty() || value.equals("-") || value.equals("0");
+
+		return predicate.or(value -> {
+			if (!WHOLE_NUMBER_PATTERN.matcher(value).find())
+				return false;
+
+			BigDecimal numericValue = new BigDecimal(value);
+
+			if (numericValue.compareTo(BigDecimal.valueOf(Long.MAX_VALUE)) > 0)
+				return false;
+
+			return numericValue.compareTo(BigDecimal.valueOf(Long.MIN_VALUE)) >= 0;
+		});
+	}
+
+	private static Predicate<String> bytePredicate(boolean isExitingField) {
+		Predicate<String> predicate = isExitingField ? value -> false : value -> value.isEmpty() || value.equals("-") || value.equals("0");
+
+		return predicate.or(value -> {
+			if (!WHOLE_NUMBER_PATTERN.matcher(value).find())
+				return false;
+
+			BigDecimal numericValue = new BigDecimal(value);
+
+			if (numericValue.compareTo(BigDecimal.valueOf(Byte.MAX_VALUE)) > 0)
+				return false;
+
+			return numericValue.compareTo(BigDecimal.valueOf(Byte.MIN_VALUE)) >= 0;
+		});
+	}
+
+	private static Predicate<String> floatPredicate(boolean isExitingField) {
+		Predicate<String> predicate = isExitingField ? value -> false : value -> value.isEmpty() || PARTIAL_DECIMAL_NUMBER_PATTERN.matcher(value).find();
+
+		return predicate.or(value -> {
+			if (!DECIMAL_NUMBER_PATTERN.matcher(value).find())
+				return false;
+
+			BigDecimal numericValue = new BigDecimal(value);
+
+			if (numericValue.compareTo(BigDecimal.valueOf(Float.MAX_VALUE)) > 0)
+				return false;
+
+			return numericValue.compareTo(BigDecimal.valueOf(Float.MIN_VALUE)) >= 0;
+		});
+	}
+
+	private static Predicate<String> doublePredicate(boolean isExitingField) {
+		Predicate<String> predicate = isExitingField ? value -> false : value -> value.isEmpty() || PARTIAL_DECIMAL_NUMBER_PATTERN.matcher(value).find();
+
+		return predicate.or(value -> {
+			if (!DECIMAL_NUMBER_PATTERN.matcher(value).find())
+				return false;
+
+			BigDecimal numericValue = new BigDecimal(value);
+
+			if (numericValue.compareTo(BigDecimal.valueOf(Double.MAX_VALUE)) > 0)
+				return false;
+
+			return numericValue.compareTo(BigDecimal.valueOf(Double.MIN_VALUE)) >= 0;
+		});
+	}
+
+	private Predicate<String> getInputPredicate(Number defaultValue, boolean isExitingField) {
+		if (defaultValue instanceof Integer) {
+			return isExitingField ? integerPredicate(true) : INTEGER_FORMAT_PREDICATE;
 		}
-		else {
-			return string -> string.isEmpty() || Pattern.compile("^-|(-?[0-9]+(\\.?[0-9]*)?)$").matcher(string).find();
+		else if (defaultValue instanceof Long) {
+			return isExitingField ? longPredicate(true) : LONG_FORMAT_PREDICATE;
 		}
+		else if (defaultValue instanceof Byte) {
+			return isExitingField ? bytePredicate(true) : BYTE_FORMAT_PREDICATE;
+		}
+		else if (defaultValue instanceof Float) {
+			return isExitingField ? floatPredicate(true) : FLOAT_FORMAT_PREDICATE;
+		}
+		else if (defaultValue instanceof Double) {
+			return isExitingField ? doublePredicate(true) : DOUBLE_FORMAT_PREDICATE;
+		}
+
+		return value -> value.isEmpty() || value.equals("-") || value.equals("0") || DECIMAL_NUMBER_PATTERN.matcher(value).find();
 	}
 }
