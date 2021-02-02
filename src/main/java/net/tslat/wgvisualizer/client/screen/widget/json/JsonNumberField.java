@@ -30,13 +30,13 @@ public class JsonNumberField extends TextFieldWidget implements JsonValueWidget<
 	public JsonNumberField(FontRenderer fontRenderer, int x, int y, String fieldId, JsonFieldsHolder<?> parent, Number defaultValue, Number currentValue, ITextComponent title) {
 		super(fontRenderer, x, y, JSON_WIDGET_WIDTH, JSON_WIDGET_HEIGHT, title);
 
-		this.defaultValue = defaultValue;
+		this.defaultValue = convertDefaultForCompatibility(defaultValue);
 		this.fieldId = fieldId;
 		this.fieldPath = parent.getFieldPath() + "." + fieldId;
 		this.parent = parent;
 
 		setText(currentValue.toString());
-		setValidator(getInputPredicate(defaultValue, false));
+		setValidator(getInputPredicate(this.defaultValue, false));
 		setTextColour(getText());
 		setResponder(this::setTextColour);
 		setCursorPosition(0);
@@ -234,5 +234,9 @@ public class JsonNumberField extends TextFieldWidget implements JsonValueWidget<
 		}
 
 		return value -> value.isEmpty() || value.equals("-") || value.equals("0") || DECIMAL_NUMBER_PATTERN.matcher(value).find();
+	}
+
+	private static Number convertDefaultForCompatibility(Number defaultValue) {
+		return defaultValue instanceof Double || defaultValue instanceof Float ? defaultValue : defaultValue.longValue();
 	}
 }
