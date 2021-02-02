@@ -107,8 +107,8 @@ public class JsonNumberField extends TextFieldWidget implements JsonValueWidget<
 		else if (defaultValue instanceof Float) {
 			return Float.parseFloat(getText());
 		}
-		else if (defaultValue instanceof Integer || defaultValue instanceof Short || defaultValue instanceof Byte) {
-			return Integer.parseInt(getText());
+		else if (defaultValue instanceof Long || defaultValue instanceof Integer || defaultValue instanceof Short || defaultValue instanceof Byte) {
+			return Long.parseLong(getText());
 		}
 
 		return 0;
