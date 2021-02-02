@@ -18,6 +18,7 @@ public class JsonNumberField extends TextFieldWidget implements JsonValueWidget<
 	private static final Predicate<String> INTEGER_FORMAT_PREDICATE = integerPredicate(false);
 	private static final Predicate<String> LONG_FORMAT_PREDICATE = longPredicate(false);
 	private static final Predicate<String> BYTE_FORMAT_PREDICATE = bytePredicate(false);
+	private static final Predicate<String> SHORT_FORMAT_PREDICATE = shortPredicate(false);
 	private static final Predicate<String> FLOAT_FORMAT_PREDICATE = floatPredicate(false);
 	private static final Predicate<String> DOUBLE_FORMAT_PREDICATE = doublePredicate(false);
 
@@ -164,6 +165,22 @@ public class JsonNumberField extends TextFieldWidget implements JsonValueWidget<
 		});
 	}
 
+	private static Predicate<String> shortPredicate(boolean isExitingField) {
+		Predicate<String> predicate = isExitingField ? value -> false : value -> value.isEmpty() || value.equals("-") || value.equals("0");
+
+		return predicate.or(value -> {
+			if (!WHOLE_NUMBER_PATTERN.matcher(value).find())
+				return false;
+
+			BigDecimal numericValue = new BigDecimal(value);
+
+			if (numericValue.compareTo(BigDecimal.valueOf(Short.MAX_VALUE)) > 0)
+				return false;
+
+			return numericValue.compareTo(BigDecimal.valueOf(Short.MIN_VALUE)) >= 0;
+		});
+	}
+
 	private static Predicate<String> floatPredicate(boolean isExitingField) {
 		Predicate<String> predicate = isExitingField ? value -> false : value -> value.isEmpty() || PARTIAL_DECIMAL_NUMBER_PATTERN.matcher(value).find();
 
@@ -205,6 +222,9 @@ public class JsonNumberField extends TextFieldWidget implements JsonValueWidget<
 		}
 		else if (defaultValue instanceof Byte) {
 			return isExitingField ? bytePredicate(true) : BYTE_FORMAT_PREDICATE;
+		}
+		else if (defaultValue instanceof Short) {
+			return isExitingField ? shortPredicate(true) : SHORT_FORMAT_PREDICATE;
 		}
 		else if (defaultValue instanceof Float) {
 			return isExitingField ? floatPredicate(true) : FLOAT_FORMAT_PREDICATE;
