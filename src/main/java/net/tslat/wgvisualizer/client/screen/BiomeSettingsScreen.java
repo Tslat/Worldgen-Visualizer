@@ -126,6 +126,12 @@ public class BiomeSettingsScreen extends Screen {
 	}
 
 	protected static void updateSettings(JsonObject data) {
+		if (data.has("features"))
+			data.remove("features");
+
+		if (data.has("starts"))
+			data.remove("starts");
+
 		currentSettings = data;
 		editedSettings = data;
 
