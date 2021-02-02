@@ -16,6 +16,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.SectionPos;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.Dimension;
@@ -132,8 +133,9 @@ public final class Operations {
 
 	public static void handleSettingsSync(JsonObject data, NetworkEvent.Context packetContext) {
 		backupWorldgenData = copyJsonObject(currentWorldgenData);
-		ServerWorld world = packetContext.getSender().getServerWorld();
-		BlockPos playerPos = packetContext.getSender().getPosition();
+		ServerPlayerEntity sender = packetContext.getSender();
+		ServerWorld world = sender.getServerWorld();
+		BlockPos playerPos = sender.getPosition();
 
 		for (Map.Entry<String, JsonElement> entry : data.entrySet()) {
 			currentWorldgenData.add(entry.getKey(), entry.getValue());
@@ -189,7 +191,8 @@ public final class Operations {
 		catch (Exception ex) {
 			WorldGenVisualizer.LOGGER.log(Level.ERROR, "Invalid worldgen data update requested. Reverting to previous known configuration.");
 			ex.printStackTrace();
-			packetContext.getSender().sendMessage(new TranslationTextComponent("message." + WorldGenVisualizer.MOD_ID + ".feedback.invalidData").mergeStyle(TextFormatting.RED), Util.DUMMY_UUID);
+			sender.sendMessage(new TranslationTextComponent("message." + WorldGenVisualizer.MOD_ID + ".feedback.invalidData").mergeStyle(TextFormatting.RED), Util.DUMMY_UUID);
+			sender.sendMessage(new StringTextComponent(ex.getLocalizedMessage()).mergeStyle(TextFormatting.DARK_RED), Util.DUMMY_UUID);
 
 			currentWorldgenData = backupWorldgenData;
 		}
