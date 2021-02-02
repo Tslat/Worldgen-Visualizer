@@ -20,7 +20,7 @@ import static net.tslat.wgvisualizer.WorldGenVisualizer.MOD_ID;
 
 @Mod(MOD_ID)
 public class WorldGenVisualizer {
-	public static final String VERSION = "0.2 (Alpha)";
+	public static final String VERSION = "0.3 (Alpha)";
 	public static final String MOD_ID = "wgvisualizer";
 	public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
 
